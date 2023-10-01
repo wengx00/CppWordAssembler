@@ -1,7 +1,7 @@
 {
   "name": "CppWordAssembler",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "C++单词拼装器，支持分词解析",
   "main": "./out/main/index.js",
   "author": "WengXing",
   "homepage": "https://www.electronjs.org",
@@ -14,18 +14,22 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
+    "version": "electron -v",
     "skipcheck:build": "electron-vite build",
     "rebuild": "electron-rebuild",
     "postinstall": "electron-builder install-app-deps",
-    "build:win": "npm run build && electron-builder --win --config",
+    "build:win": "npm run skipcheck:build && electron-builder --win --config",
     "build:mac": "electron-vite build && electron-builder --mac --config",
-    "build:linux": "electron-vite build && electron-builder --linux --config"
+    "build:linux": "electron-vite build && electron-builder --linux --config",
+    "build:all": "cd core && cmake . && cmake --build . && cd .. && npm run rebuild && electron-vite build && electron-builder --mac --config"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "@electron/remote": "^2.0.11",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.11",
     "@mui/material": "^5.14.11",
     "ffi-napi": "^4.0.3"
   },

@@ -29,12 +29,11 @@ ul {
 }
 
 .code {
+  width: 100%;
+  height: fit-content;
   box-sizing: border-box;
-  padding: 0.5rem;
   font-weight: 400;
   line-height: 150%;
-  // background-color: #f3f3f3;
-  font-size: 90%;
   font-family:
     ui-monospace,
     SFMono-Regular,
@@ -97,14 +96,20 @@ ul {
     height: 100%;
     overflow: hidden;
     overflow-y: auto;
+    @extend .col;
+
+    &.preview {
+      box-sizing: border-box;
+      padding: 0.5rem;
+    }
 
     &.result {
       flex: 1.5 0;
       @extend .row;
       flex-wrap: wrap;
       box-sizing: border-box;
-      padding: 1rem 0.5rem 1rem 1rem;
-      gap: 1rem;
+      padding: 0.5rem;
+      gap: 0.5rem;
     }
   }
 }
@@ -116,7 +121,6 @@ ul {
   border-radius: 0.5rem;
   gap: 0.5rem;
   @extend .col;
-  gap: 0.5rem;
   text-transform: none;
   justify-content: space-between;
   
@@ -125,6 +129,7 @@ ul {
     flex-shrink: 0;
     color: #252725;
     overflow: hidden;
+    font-size: 120%;
     font-weight: 700;
     white-space: pre-wrap;
     word-break: break-all;
@@ -135,5 +140,6 @@ ul {
     flex-shrink: 0;
     color: #888;
     font-weight: 400;
+    text-align: left;
   }
 }

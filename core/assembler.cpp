@@ -412,7 +412,6 @@ extern "C" EXPORT bool assemble(string input, string output)
         cur["value"] = token.value;
         cur["typeId"] = token.type;
         value.append(cur);
-        printf("%d %s \n", token.type, token.value.c_str());
     }
     fs.close();
     // JSON序列化为字符串

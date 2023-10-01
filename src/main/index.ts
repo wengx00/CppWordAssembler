@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import remote from '@electron/remote/main'
 
 function createWindow(): void {
   // Create the browser window.
@@ -16,8 +17,8 @@ function createWindow(): void {
       sandbox: false
     }
   })
-
-  mainWindow.webContents.openDevTools()
+  remote.initialize()
+  remote.enable(mainWindow.webContents)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -42,7 +43,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('cn.wengxing')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

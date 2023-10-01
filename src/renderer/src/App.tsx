@@ -1,6 +1,7 @@
-import { Button, ButtonBase, Stack, Typography } from '@mui/material'
+import { Button, Stack, TextField } from '@mui/material'
+import { useRef, useState } from 'react'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import './assets/index.scss'
-import { useState } from 'react'
 
 enum TokenType {
   KEYWORD,    // 关键字
@@ -22,6 +23,7 @@ type Token = {
 function App(): JSX.Element {
   const [result, setResult] = useState<Token[]>()
   const [preview, setPreview] = useState<string>()
+  const inputRef = useRef()
   const handler = {
     chooseFile() {
       const action = document.createElement('input')
@@ -30,16 +32,18 @@ function App(): JSX.Element {
       action.onchange = () => {
         if (!action.files || !action.files.length) return
         const file = action.files[0]
-        handler.assemble(file.path)
         handler.setPreview(file)
       }
       action.click()
     },
     // 调用C++原生模块
-    async assemble(input: string, output?: string) {
+    async assemble(input: string) {
       const res = await (window.api as any).assemble(input)
       setResult(res)
-      console.log(res)
+    },
+    async assembleByInput(text: string) {
+      const res = await (window.api as any).assembleByInput(text)
+      setResult(res)
     },
     // 设置预览整个文件
     setPreview(file: File) {
@@ -47,7 +51,6 @@ function App(): JSX.Element {
       reader.onload = () => {
         const result = reader.result
         setPreview(result?.toString() ?? "")
-        console.log(result)
       }
       reader.readAsText(new Blob([file]))
     },
@@ -55,7 +58,7 @@ function App(): JSX.Element {
     getColorByType(type: TokenType) {
       switch (type) {
         case TokenType.COMMENT:
-          return '#00c756'
+          return '#00a756'
         case TokenType.DELIMITER:
           return '#6177ff'
         case TokenType.ERROR:
@@ -63,31 +66,40 @@ function App(): JSX.Element {
         case TokenType.IDENTIFIER:
           return '#a4a323'
         case TokenType.KEYWORD:
-          return '#6fbff9'
+          return '#2f4fb9'
         case TokenType.NUMBER:
-          return '#aabb9d'
+          return '#aa455a'
         case TokenType.OPERATOR:
           return '#252742'
         case TokenType.STRING:
           return '#c5947c'
       }
+    },
+    // 触发调用
+    callNative() {
+      if (!inputRef?.current) {
+        return
+      }
+      handler.assembleByInput((inputRef?.current as any).value)
     }
   }
 
   return (
     <div className='root'>
       <div className='header'>
-        <Typography component="div">解析面板 - </Typography>
         <Button onClick={handler.chooseFile} variant='contained' size='small'>选择文件</Button>
+        <Button onClick={handler.callNative} variant='outlined' size='small' endIcon={<PlayArrowIcon sx={{ml: -1}} />}>开始解析</Button>
       </div>
       <Stack direction='row' className='content' spacing={1}>
-        <div className='half code'>{preview}</div>
+        <div className='half preview'>
+          <TextField inputRef={inputRef} placeholder='选择解析文件或输入代码' className='code' multiline defaultValue={preview} />
+        </div>
         <div className='half result'>
           {result?.map((item, index) => {
             return (
-              <Button key={index} variant='outlined' sx={{ width: 'calc(50% - 1rem)' }}>
+              <Button key={index} variant='outlined' sx={{ width: 'calc(50% - 0.5rem)' }}>
                 <div className='token'>
-                  <div className='value'  style={{ color: handler.getColorByType(item.typeId) }}>{item.value}</div>
+                  <div className='value' style={{ color: handler.getColorByType(item.typeId) }}>{item.value}</div>
                   <div className='type'>{item.type}</div>
                 </div>
               </Button>

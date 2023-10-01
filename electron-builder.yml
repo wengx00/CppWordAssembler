@@ -37,7 +37,7 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: WengXing
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}

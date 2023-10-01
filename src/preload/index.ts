@@ -1,8 +1,9 @@
-import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge } from 'electron'
 import ffi from 'ffi-napi'
+import { readFile, writeFileSync } from 'fs'
 import path from 'path'
-import { readFile } from 'fs'
+import { app } from '@electron/remote'
 
 
 const nativePath = 
@@ -10,22 +11,39 @@ const nativePath =
   path.resolve(__dirname, "../../core/build/libassembler.dylib") :
   path.resolve(__dirname, "../../../native/libassembler.dylib")
 const assembleLib = ffi.Library(nativePath, {
-  'assemble': ['bool', ['string', 'string']]
+  'assemble': ['bool', ['string', 'string']],
 })
+const root = app.getPath('temp')
 
 // Custom APIs for renderer
 const api = {
-  assemble: (input: string, output?: string) => new Promise((resolve, reject) => {
-    const status = assembleLib.assemble(input, output ?? (input + ".output.json"))
+  assemble: (input: string) => new Promise((resolve, reject) => {
+    input = input.replace(/\\/g, '\\\\')
+    const output = path.resolve(root, "./tmp.json")
+    const status = assembleLib.assemble(input, output)
     if (!status) {
       reject("结果写入错误")
     }
-    readFile(output ?? (input + ".output.json"), (err, data) => {
+    readFile(output, (err, data) => {
       if (err) return reject(err)
       const res = JSON.parse(data.toString('utf-8'))
       resolve(res)
     })
-  })
+  }),
+  assembleByInput: (text: string) => new Promise((resolve, reject) => {
+    const input = path.resolve(root, "./tmp-input")
+    writeFileSync(input, text, { encoding: 'utf-8' })
+    const output = path.resolve(root, "./tmp.json")
+    const status = assembleLib.assemble(input, output)
+    if (!status) {
+      reject("结果写入错误")
+    }
+    readFile(output, (err, data) => {
+      if (err) return reject(err)
+      const res = JSON.parse(data.toString('utf-8'))
+      resolve(res)
+    })
+  }),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
