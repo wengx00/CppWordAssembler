@@ -13,7 +13,7 @@
 using namespace std;
 
 // 运算符
-const char operators[] = {'+', '-', '*', '/', '%', '>', '<', '=', '|', '&', '~', '!'};
+const char operators[] = {'+', '-', '*', '/', '%', '>', '<', '=', '|', '&', '~', '!', '^'};
 // 分隔符
 const char delimiters[] = {'(', ')', '{', '}', '[', ']', '#', ';', ',', ':', '.', '"', '\''};
 // 关键字
@@ -178,6 +178,7 @@ Token toNumberToken(char start, fstream &fs)
         // 十六进制
         if (cur == 'x' || cur == 'X')
         {
+            value += cur;
             while (fs.get(cur))
             {
                 if (isDigit(cur) || isHex(cur))
@@ -204,7 +205,7 @@ Token toAlphaToken(char start, fstream &fs)
     char cur;
     while (fs.get(cur))
     {
-        if (isAlpha(cur))
+        if (isAlpha(cur) || isDigit(cur))
         {
             value += cur;
             continue;
