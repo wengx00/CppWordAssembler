@@ -22,8 +22,7 @@ type Token = {
 
 function App(): JSX.Element {
   const [result, setResult] = useState<Token[]>()
-  const [preview, setPreview] = useState<string>()
-  const inputRef = useRef()
+  const inputRef = useRef<any>()
   const handler = {
     chooseFile() {
       const action = document.createElement('input')
@@ -32,7 +31,8 @@ function App(): JSX.Element {
       action.onchange = () => {
         if (!action.files || !action.files.length) return
         const file = action.files[0]
-        handler.setPreview(file)
+        console.log(!!inputRef.current?.value)
+        setTimeout(() => handler.setPreview(file))
       }
       action.click()
     },
@@ -50,7 +50,8 @@ function App(): JSX.Element {
       const reader = new FileReader()
       reader.onload = () => {
         const result = reader.result
-        setPreview(result?.toString() ?? "")
+        inputRef.current.value = result
+        inputRef.current.focus?.()
       }
       reader.readAsText(new Blob([file]))
     },
@@ -92,7 +93,7 @@ function App(): JSX.Element {
       </div>
       <Stack direction='row' className='content' spacing={1}>
         <div className='half preview'>
-          <TextField inputRef={inputRef} placeholder='选择解析文件或输入代码' className='code' multiline defaultValue={preview} />
+          <TextField inputRef={inputRef} placeholder='选择解析文件或输入代码' className='code' multiline />
         </div>
         <div className='half result'>
           {result?.map((item, index) => {
